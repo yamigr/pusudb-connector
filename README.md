@@ -38,6 +38,8 @@ connector.run(function(err){
     console.log(connector.db['process'].data)
 
     /***************QUERY*****************/
+    // to handle db-queries
+
     // post db, meta, data
     connector.db['component'].postData('layout', 'put', { key : 'schema:component', value: 'some-value'}, function(err, data){
         console.log(err, data)
@@ -51,8 +53,8 @@ connector.run(function(err){
 
 
     /***************EVENTS*****************/
-
-
+    // to receive the actual data from pusudb
+    
     // handle message for db component
     connector.db['component'].on('message', function(msg){
         // receiving every message in db component with the key component:client...
