@@ -2,9 +2,9 @@
 
 > Create connector-drivers for the pusudb-framework.
 
-Define the configuration and run the connector. For each configuration it starts a connector instances. To handle the data received by the pusudb listen to the events described below. The event message will be fired, everytime when someone put, update or publish a entry in the certain db and the defined key as substring. When the method run is called, it querying first the pusudb and streams all the entries which contains the key defined in the configuration. 
-
 Framework: [https://www.npmjs.com/package/pusudb](https://www.npmjs.com/package/pusudb)
+
+Define the configuration and run the connector. For each configuration it creates a connection to the pusudb. When the method run is called, it querying first the pusudb and streams all the entries which contains the key defined in the configuration. To receive the data, listen to the events described below. The event message will be fired, everytime when someone put, update or publish a entry in the certain db and the defined key as substring. 
 
 <a name="installing"></a>
 ## Installing
@@ -55,6 +55,7 @@ connector.run(function(err){
 
     // handle message for db component
     connector.db['component'].on('message', function(msg){
+        // receiving every message in db component with the key component:client...
         console.error('component message:', msg)
     })
 
@@ -65,6 +66,7 @@ connector.run(function(err){
 
     // handle messages for db process
     connector.db['process'].on('message', function(msg){
+        // receiving every message in db process with the key process:client...
         console.error('process message:', msg)
     })
 
