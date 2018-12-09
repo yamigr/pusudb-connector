@@ -9,7 +9,11 @@
   "keywords": [
     "pusudb",
     "connector",
-    "connect"
+    "connect",
+    "iot",
+    "driver",
+    "backend",
+    "realtime"
   ],
   "homepage": "https://github.com/yamigr/pusudb-connector#readme",
   "author": "yannick grund, https://github.com/yamigr",
