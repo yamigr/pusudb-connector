@@ -1,0 +1,22 @@
+{
+  "name": "pusudb-connector",
+  "version": "0.0.1",
+  "description": "Handle a component and process pusudb-connector, to create components like a mqtt-client,...",
+  "main": "lib/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "pusudb",
+    "connector",
+    "connect"
+  ],
+  "homepage": "https://github.com/yamigr/pusudb-connector#readme",
+  "author": "yannick grund, https://github.com/yamigr",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^2.6.1",
+    "request": "^2.88.0",
+    "ws": "^6.1.2"
+  }
+}
