@@ -1,6 +1,6 @@
 {
   "name": "pusudb-connector",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Handle a component and process pusudb-connector, to create components like a mqtt-client,...",
   "main": "lib/main.js",
   "scripts": {
