@@ -122,9 +122,9 @@ connectComponent.on('error', function(err){
 // QUERY API
 
 // Push data direct to the defined db in cfg
-connectComponent.push('update' /*or 'publish', 'put', ... see pusudb-metas*/, { key : data.key, value : data.value})
+connectComponent.push_('update' /*or 'publish', 'put', ... see pusudb-metas*/, { key : data.key, value : data.value})
 // Pull data direct from the defined db in cfg
-connectComponent.pull('stream' /*or 'publish', 'put', ... see pusudb-metas*/, { gte : 'bla:', lte: 'bla:~'}, function(err, data){
+connectComponent.pull_('stream' /*or 'publish', 'put', ... see pusudb-metas*/, { gte : 'bla:', lte: 'bla:~'}, function(err, data){
     // handle err or json-data
 })
 
