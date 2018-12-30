@@ -1,10 +1,10 @@
 # pusudb-connector
 
-> Create connector-drivers for the pusudb-framework.
+> Create a connector for the pusudb-framework.
 
 Framework: [https://www.npmjs.com/package/pusudb](https://www.npmjs.com/package/pusudb)
 
-Define the configuration and run the connector. For each configuration it creates a connection to the pusudb. When the method run is called, it querying first the pusudb and streams all the entries which contains the key defined in the configuration. To receive the data, listen to the events described below. The event message will be fired, everytime when someone put, update or publish a entry in the certain db and the defined key as substring. 
+Define the configuration and open the connection. Then subscribe the key defined in the config and handle the events or do some other queries.
 
 <a name="installing"></a>
 ## Installing
@@ -15,68 +15,137 @@ npm install pusudb-connector --save
 
 ## Use
 
-
 ```js
 
 const Connector = require('pusudb-connector')
 
-// Configuration
-let cfg = [
-    { key : 'component:client', db : 'component', url : 'localhost:3000/api', username : '', password : ''}, 
-    { key : 'process:client', db : 'process', url : 'localhost:3000/api', username : '', password : ''}
-]
+// Create instance
+let connectComponent = new Connector({ key : 'sensor:rapport', db : 'component', url : '192.168.178.20:3000/api', username : '', password : ''})
 
+// Create connection 
+connectComponent.open()
 
-let connector = new Connector(cfg)
+// Fired when the connection is open
+connectComponent.on('open', function(){
 
-connector.run(function(err){
+    // subscribe the defined key in the defined db
+    connectComponent.subscribeAll()
 
-    console.log('done')
-    // all components
-    console.log(connector.db['component'].data)
-    // all processes
-    console.log(connector.db['process'].data)
+    // unsubscribe the defined key in the defined db
+    //connectComponent.unsubscribeAll()
 
-    /***************QUERY*****************/
-    // to handle db-queries
-
-    // post db, meta, data
-    connector.db['component'].postData('layout', 'put', { key : 'schema:component', value: 'some-value'}, function(err, data){
-        console.log(err, data)
-    })
-    // get query db, meta, get-params
-    connector.db['component'].getData('layout', 'stream', 'gte=schema:&lte=schema~', function(err, data){
-        console.log(err, data)
-    })
-    // websocket send db, meta, data
-    connector.db['component'].sendData('component', 'update', { key : 'some:client', value : 'some-value'})
-
-
-    /***************EVENTS*****************/
-    // to receive the actual data from pusudb
-    
-    // handle message for db component
-    connector.db['component'].on('message', function(msg){
-        // receiving every message in db component with the key component:client...
-        console.error('component message:', msg)
-    })
-
-    // handle error for db component
-    connector.db['component'].on('error', function(err){
-        console.error('component err:', err)
-    })
-
-    // handle messages for db process
-    connector.db['process'].on('message', function(msg){
-        // receiving every message in db process with the key process:client...
-        console.error('process message:', msg)
-    })
-
-    // handle error for db process
-    connector.db['process'].on('error', function(err){
-        console.error('process err:', err)
+    // get all entries by key
+    connectComponent.streamAll(function(err, data){
+        console.log(data)
+        /*
+            {
+            "err": null, // error message
+            "db": "db", // db name
+            "meta": "update", // or others
+            "data": [{key : '', value : ''}, ...] // see pusudb-api doc
+            }
+        */
     })
 })
+
+
+// Fired when the db entry has changed by put
+connectComponent.on('put', function(data){
+
+    console.log('put message:', data)
+    /*
+        {
+        "err": null, // error message
+        "db": "db", // db name
+        "meta": "update", // or others
+        "data": { key : '', value : 'all values'} // see pusudb-api doc
+        }
+    */
+})
+
+// Fired when the db entry has changed by update
+connectComponent.on('update', function(data){
+
+    console.log('update message:', data)
+    /*
+        {
+        "err": null, // error message
+        "db": "db", // db name
+        "meta": "update", // or others
+        "data": { key : '', value : 'only the specific updated value'} // see pusudb-api doc
+        }
+    */
+})
+
+// Fired when the db entry has changed by delete
+connectComponent.on('del', function(data){
+
+    console.log('delete message:', data)
+    /*
+        {
+        "err": null, // error message
+        "db": "db", // db name
+        "meta": "del", // or others
+        "data": 'key' // see pusudb-api doc
+        }
+    */
+})
+
+
+// Fired when the db entry has changed by batch
+connectComponent.on('batch', function(data){
+
+    console.log('batch message:', data)
+    /*
+        {
+        "err": null, // error message
+        "db": "db", // db name
+        "meta": "update", // or others
+        "data": [{ key : '', value : 'all values'},...] // see pusudb-api doc
+        }
+    */
+})
+
+// Fired when the websocket is closed. It will try to reconnet every 10s.
+// Change interval connectComponent.reconnectInterval = ...ms
+connectComponent.on('close', function(e){
+    console.error(e)
+})
+
+// Fired when an error occurred
+connectComponent.on('error', function(err){
+    console.error(err)
+})
+
+
+/********************************************************/
+// QUERY API
+
+// Push data direct to the defined db in cfg
+connectComponent.push('update' /*or 'publish', 'put', ... see pusudb-metas*/, { key : data.key, value : data.value})
+// Pull data direct from the defined db in cfg
+connectComponent.pull('stream' /*or 'publish', 'put', ... see pusudb-metas*/, { gte : 'bla:', lte: 'bla:~'}, function(err, data){
+    // handle err or json-data
+})
+
+
+// Get query arguments = db, meta, params, callback
+connectComponent.get_('db', 'stream' /*or 'publish', 'put', ... see pusudb-metas*/, 'gte=componentA&lte=componentA~', function(err, body){
+    try{
+        body = JSON.parse(body)
+    }
+    catch(e){
+        console.error(e)
+    }     
+})
+
+// Post query arguments = db, meta, json-data
+connectComponent.post_('db', 'put', json, function(err, data){
+
+})
+
+// Websocket query arguments = db, meta, json-data
+connectComponent.send_('db', 'get', json )
 
 ```
 

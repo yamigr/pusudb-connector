@@ -1,7 +1,7 @@
 {
   "name": "pusudb-connector",
   "version": "0.0.2",
-  "description": "Handle a component and process pusudb-connector, to create components like a mqtt-client,...",
+  "description": "Create a connector for the pusudb-framework.",
   "main": "lib/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
