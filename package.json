@@ -1,6 +1,6 @@
 {
   "name": "pusudb-connector",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Create a connector for the pusudb-framework.",
   "main": "lib/main.js",
   "scripts": {
