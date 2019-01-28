@@ -31,7 +31,8 @@ let connectComponent = new Connector({ key : 'sensor:rapport',
                                        db : 'component', 
                                        url : '192.168.178.20:3000/api', 
                                        login : { email : '', password: '' }, // or null when no login required, check object in pusudb
-                                       subscribeWhenOpen : true
+                                       subscribeWhenOpen : true,
+                                       heartbeat : 30000 // default or set the same value like in pusudb
 })
 
 // Create connection 
