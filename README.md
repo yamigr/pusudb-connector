@@ -47,7 +47,7 @@ connectComponent.on('open', function(){
     //connectComponent.unsubscribeWildcard()
 
     // get all entries by key
-    connectComponent.streamAll(function(err, data){
+    connectComponent.stream(function(err, data){
         console.log(data)
         /*
             {
