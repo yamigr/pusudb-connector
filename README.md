@@ -4,7 +4,7 @@
 
 Framework: [https://www.npmjs.com/package/pusudb](https://www.npmjs.com/package/pusudb)
 
-Define the configuration and open the connection. Then subscribe the key defined in the config and handle the events or do some other queries.
+Define the configuration and open the connection. When a key is subscribed, then each event will be fired according the meta. Check the pusudb docs for the metas.
 
 <a name="installing"></a>
 ## Installing
@@ -15,12 +15,24 @@ npm install pusudb-connector --save
 
 ## Use
 
+Options
+* key of the pusudb-connector-instance 
+* db is the db-name where the pusudb stores the data
+* url of the [pusudb](https://www.npmjs.com/package/pusudb)
+* login-object of the [pusudb-use-auth-jwt](https://www.npmjs.com/package/pusudb-use-auth-jwt)
+* subscribeWhenOpen if true, then the key will be subscribed when the connection is open
+
 ```js
 
 const Connector = require('pusudb-connector')
 
 // Create instance
-let connectComponent = new Connector({ key : 'sensor:rapport', db : 'component', url : '192.168.178.20:3000/api', username : '', password : ''})
+let connectComponent = new Connector({ key : 'sensor:rapport', 
+                                       db : 'component', 
+                                       url : '192.168.178.20:3000/api', 
+                                       login : { email : '', password: '' }, // or null when no login required, check object in pusudb
+                                       subscribeWhenOpen : true
+})
 
 // Create connection 
 connectComponent.open()
@@ -29,10 +41,10 @@ connectComponent.open()
 connectComponent.on('open', function(){
 
     // subscribe the defined key in the defined db
-    connectComponent.subscribeAll()
+    //connectComponent.subscribeWildcard()
 
     // unsubscribe the defined key in the defined db
-    //connectComponent.unsubscribeAll()
+    //connectComponent.unsubscribeWildcard()
 
     // get all entries by key
     connectComponent.streamAll(function(err, data){
@@ -106,6 +118,20 @@ connectComponent.on('batch', function(data){
     */
 })
 
+// Fired when the db entry has changed by batch
+connectComponent.on('publish', function(data){
+
+    console.log('publish message:', data)
+    /*
+        {
+        "err": null, // error message
+        "db": "db", // db name
+        "meta": "update", // or others
+        "data": [{ key : '', value : 'all values'},...] // see pusudb-api doc
+        }
+    */
+})
+
 // Fired when the websocket is closed. It will try to reconnet every 10s.
 // Change interval connectComponent.reconnectInterval = ...ms
 connectComponent.on('close', function(e){
@@ -118,18 +144,20 @@ connectComponent.on('error', function(err){
 })
 
 
+connectComponent.ws.on('ping', /* heartbeat function like this one from package ws */)
+
 /********************************************************/
 // QUERY API
 
-// Push data direct to the defined db in cfg
+// webscoket Push data direct to the defined db in cfg
 connectComponent.push_('update' /*or 'publish', 'put', ... see pusudb-metas*/, { key : data.key, value : data.value})
-// Pull data direct from the defined db in cfg
+// http Pull data direct from the defined db in cfg,
 connectComponent.pull_('stream' /*or 'publish', 'put', ... see pusudb-metas*/, { gte : 'bla:', lte: 'bla:~'}, function(err, data){
     // handle err or json-data
 })
 
 
-// Get query arguments = db, meta, params, callback
+// http Get query arguments = db, meta, params, callback
 connectComponent.get_('db', 'stream' /*or 'publish', 'put', ... see pusudb-metas*/, 'gte=componentA&lte=componentA~', function(err, body){
     try{
         body = JSON.parse(body)
