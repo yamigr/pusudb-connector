@@ -30,7 +30,7 @@ const Connector = require('pusudb-connector')
 let connectComponent = new Connector({ key : 'sensor:rapport', 
                                        db : 'component', 
                                        url : '192.168.178.20:3000/api', 
-                                       login : { email : '', password: '' }, // or null when no login required, check object in pusudb
+                                       login : null, // or { email : '', password: '' } when login required, check props in pusudb-configuration
                                        subscribeWhenOpen : true,
                                        heartbeat : 30000 // default or set the same value like in pusudb
 })
